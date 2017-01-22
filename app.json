@@ -1,0 +1,8 @@
+{
+  "name": "Nodejs Unix Timestamp Micro Service",
+  "description": "A barebones Node.js app using Express 4",
+  "repository": "https://gitlab.com/jacebenson/fcc-microservice-timestamp",
+  "logo": "http://node-js-sample.herokuapp.com/node.svg",
+  "keywords": ["node"],
+  "image": "heroku/nodejs"
+}
