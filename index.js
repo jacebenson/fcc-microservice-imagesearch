@@ -75,7 +75,7 @@ function handleRequest(request, response) {
     console.log('getting recent queries');
     MongoClient.connect(mongoURI, function (err, db) {
       if (err) throw err;
-      db.collection('imagesearches').find({ id: parseInt(input, 10) }, function (err, item) {
+      db.collection('imagesearches').find({}, function (err, item) {
         response.setHeader('Content-Type', 'application/json');
         if (item) {
           response.end(JSON.stringify(item, '', '    '));
