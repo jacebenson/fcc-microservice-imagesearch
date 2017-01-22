@@ -78,7 +78,8 @@ function handleRequest(request, response) {
       db.collection('imagesearches').find(function (err, item) {
         response.setHeader('Content-Type', 'application/json');
         if (item) {
-          response.end(JSON.stringify(item, '', '    '));
+          //response.end(JSON.stringify(item, '', '    '));
+          response.end(item);
         } else {
           response.end(JSON.stringify({ message: 'No recent searchs.' }, '', '    '));
         }
