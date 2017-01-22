@@ -22,72 +22,74 @@ function handleRequest(request, response) {
     search[filter[0]] = filter[1];
   }
   if (search.query) {
-//now query imgur
-  insert(search.query);
-  var options = {
-    host: 'api.imgur.com',
-    port: 80,
-    path: '/3/gallery/search/0.json?q=' + search.query + '&page=' + search.offset,
-    headers: {
-      Authorization: 'Client-Id ' + client_id
-    }
-  };
-  http.get(options, function (res) {
-    var body = '';
-    var returnObj = [];
-    console.log("Got response: " + res.statusCode);
-    res.on("data", function (chunk) {
-      body += chunk;
-      //console.log("BODY: " + chunk);
-    });
-    res.on("end", function () {
-      var bodyObj = JSON.parse(body);
-      //parse items;
-      var items = bodyObj.data;
-      if (items) {
-        for (var n = 0; n < items.length; n++) {
-          if (items[n].is_album === false) {
-            returnObj.push(
-              {
-                url: items[n].link,
-                snippet: items[n].title,
-              }
-            );
+    //now query imgur
+    insert(search.query);
+    var options = {
+      host: 'api.imgur.com',
+      port: 80,
+      path: '/3/gallery/search/0.json?q=' + search.query + '&page=' + search.offset,
+      headers: {
+        Authorization: 'Client-Id ' + client_id
+      }
+    };
+    http.get(options, function (res) {
+      var body = '';
+      var returnObj = [];
+      console.log("Got response: " + res.statusCode);
+      res.on("data", function (chunk) {
+        body += chunk;
+        //console.log("BODY: " + chunk);
+      });
+      res.on("end", function () {
+        var bodyObj = JSON.parse(body);
+        //parse items;
+        var items = bodyObj.data;
+        if (items) {
+          for (var n = 0; n < items.length; n++) {
+            if (items[n].is_album === false) {
+              returnObj.push(
+                {
+                  url: items[n].link,
+                  snippet: items[n].title,
+                }
+              );
+            }
           }
-        }
-        if (returnObj.length === 0) {
+          if (returnObj.length === 0) {
+            returnObj = {
+              error: 'No Results found'
+            }
+          }
+        } else {
           returnObj = {
             error: 'No Results found'
           }
         }
-      } else {
-        returnObj = {
-          error: 'No Results found'
-        }
-      }
-      response.setHeader('Content-Type', 'application/json');
-      response.end(JSON.stringify(returnObj, '', '    '));
+        response.setHeader('Content-Type', 'application/json');
+        response.end(JSON.stringify(returnObj, '', '    '));
+      });
+    }).on('error', function (e) {
+      console.log("Got error: " + e.message);
     });
-  }).on('error', function (e) {
-    console.log("Got error: " + e.message);
-  });
-  } else if (search.recent){
+  } else if (search.recent) {
     console.log('getting recent queries');
-    db.collection('imagesearches').find({ id: parseInt(input, 10) }, function (err, item) {
-      response.setHeader('Content-Type', 'application/json');
-      if(item){
-        response.end(JSON.stringify(item, '', '    '));
-      } else {
-        response.end(JSON.stringify({message: 'No recent searchs.'}, '', '    '));
-      }
+    MongoClient.connect(mongoURI, function (err, db) {
+      if (err) throw err;
+      db.collection('imagesearches').find({ id: parseInt(input, 10) }, function (err, item) {
+        response.setHeader('Content-Type', 'application/json');
+        if (item) {
+          response.end(JSON.stringify(item, '', '    '));
+        } else {
+          response.end(JSON.stringify({ message: 'No recent searchs.' }, '', '    '));
+        }
+      });
     });
-
   } else {
     console.log('query and recent params not included');
     response.setHeader('Content-Type', 'application/json');
-    response.end(JSON.stringify({error:'Param query or recent required'}, '', '    '));
+    response.end(JSON.stringify({ error: 'Param query or recent required' }, '', '    '));
   }
-  
+
 }
 function insert(query) {
   var d = new Date();
