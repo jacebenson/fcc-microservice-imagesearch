@@ -73,8 +73,14 @@ function handleRequest(request, response) {
   });
   } else if (search.recent){
     console.log('getting recent queries');
-    response.setHeader('Content-Type', 'application/json');
-    response.end(JSON.stringify({message:'getting recent queries'}, '', '    '));
+    db.collection('imagesearches').find({ id: parseInt(input, 10) }, function (err, item) {
+      response.setHeader('Content-Type', 'application/json');
+      if(item){
+        response.end(JSON.stringify(item, '', '    '));
+      } else {
+        response.end(JSON.stringify({message: 'No recent searchs.'}, '', '    '));
+      }
+    });
 
   } else {
     console.log('query and recent params not included');
