@@ -9,7 +9,9 @@
   "scripts": {
     "start": "node index.js"
   },
-  "dependencies": {},
+  "dependencies": {
+    "mongodb": "2.2.21"
+  },
   "repository": {
     "type": "git",
     "url": "https://gitlab.com/jacebenson/fcc-microservice-timestamp"
