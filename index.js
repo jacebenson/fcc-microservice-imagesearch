@@ -1,4 +1,5 @@
-var client_id = require('./.env').client_id;
+//var client_id = require('./.env').client_id;
+var client_id = process.env.CLIENT_ID;
 var http = require('http');
 var mongodb = require('mongodb');
 var mongoURI = process.env.MONGOLAB_URI;
