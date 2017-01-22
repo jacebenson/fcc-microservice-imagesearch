@@ -8,9 +8,8 @@ var MongoClient = mongodb.MongoClient;
 var url = require('url');
 const PORT = process.env.PORT || 5000;
 function handleRequest(request, response) {
-  //expects query, if missing error
+  //expects query param or recent if neither error
   //optional offset, if set, get records starting at n where n=offset
-  //return 10 images or optional param of qty
   var urlObj = url.parse(request.url.toString());
   var urlQueryArr = urlObj.query.split('&');
   var search = {
@@ -20,10 +19,10 @@ function handleRequest(request, response) {
   for (var x = 0; x < urlQueryArr.length; x++) {
     var filter = urlQueryArr[x].split('=');
     if (filter[0] == 'offset') { filter[1] = parseInt(filter[1]); }
-    if (filter[0] == 'qty') { filter[1] = parseInt(filter[1]); }
     search[filter[0]] = filter[1];
   }
-  //now query imgur
+  if (search.query) {
+//now query imgur
   insert(search.query);
   var options = {
     host: 'api.imgur.com',
@@ -66,39 +65,37 @@ function handleRequest(request, response) {
           error: 'No Results found'
         }
       }
-      /*      var returnObj = {
-              url: null,//
-              snippet: null,//title
-              context: null,
-              related_album: null,
-              body: JSON.parse(body)
-            };*/
-      //console.log(body);
       response.setHeader('Content-Type', 'application/json');
       response.end(JSON.stringify(returnObj, '', '    '));
     });
   }).on('error', function (e) {
     console.log("Got error: " + e.message);
   });
+  } else if (search.recent){
+    console.log('getting recent queries');
+  } else {
+    console.log('query and recent params not included')
+  }
+  
 }
 function insert(query) {
   var d = new Date();
-  var dateString = d.toDateString() + ' ' +d.getHours() + '00';
+  var dateString = d.toDateString() + ' ' + d.getHours() + '00';
   MongoClient.connect(mongoURI, function (err, db) {
     if (err) throw err;
     var id = db.collection('imagesearches').count({}, function (error, numOfDocs) {
       if (err) throw err;
       //console.log('numOfDocs: ' + numOfDocs);
       if (numOfDocs !== null) {
-        if(numOfDocs > 5){
+        if (numOfDocs > 5) {
           //console.log('numOfDocs > 5 deleting one where, dateString: ' + dateString);
-          db.collection('imagesearches').remove({created: {$ne : dateString}});
+          db.collection('imagesearches').remove({ created: { $ne: dateString } });
         }
       }
-      item = { 
+      item = {
         query: query,
-        created: dateString 
-        };
+        created: dateString
+      };
       db.collection('imagesearches').insert(item);
       db.close();
     });
