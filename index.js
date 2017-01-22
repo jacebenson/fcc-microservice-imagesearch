@@ -73,8 +73,13 @@ function handleRequest(request, response) {
   });
   } else if (search.recent){
     console.log('getting recent queries');
+    response.setHeader('Content-Type', 'application/json');
+    response.end(JSON.stringify({message:'getting recent queries'}, '', '    '));
+
   } else {
-    console.log('query and recent params not included')
+    console.log('query and recent params not included');
+    response.setHeader('Content-Type', 'application/json');
+    response.end(JSON.stringify({error:'Param query or recent required'}, '', '    '));
   }
   
 }
