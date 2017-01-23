@@ -89,7 +89,11 @@ function handleRequest(request, response) {
   } else {
     console.log('query and recent params not included');
     response.setHeader('Content-Type', 'application/json');
-    response.end(JSON.stringify({ error: 'Param query or recent required' }, '', '    '));
+    response.end(JSON.stringify({ 
+      error: 'Param query or recent required',
+      example_query: '/api/imagesearch/?query=cats',
+      example_history: '/api/imagesearch/?recent=true'
+    }, '', '    '));
   }
 
 }
