@@ -73,8 +73,21 @@ function handleRequest(request, response) {
   });
   } else if (search.recent){
     console.log('getting recent queries');
-    response.setHeader('Content-Type', 'application/json');
-    response.end(JSON.stringify({message:'getting recent queries'}, '', '    '));
+    MongoClient.connect(mongoURI, function (err, db) {
+    if (err) throw err;
+    var returnArr = [];
+    var cursor = db.collection('imagesearches').find({});
+    cursor.each(function(err,doc){
+      returnArr.push(doc);
+    });
+    if(returnArr.length > 0){
+      response.setHeader('Content-Type', 'application/json');
+      response.end(JSON.stringify(returnArr, '', '    '));
+    } else {
+      response.setHeader('Content-Type', 'application/json');
+      response.end(JSON.stringify({message:'No recent queries.'}, '', '    '));
+    }
+    });
 
   } else {
     console.log('query and recent params not included');
