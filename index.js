@@ -81,7 +81,7 @@ function handleRequest(request, response) {
           response.end(JSON.stringify({ message: 'No recent queries.' }, '', '    '));
         } else {
           response.setHeader('Content-Type', 'application/json');
-          response.end(JSON.stringify(returnArr, '', '    '));
+          response.end(JSON.stringify(docs, '', '    '));
         }
       });
     });
