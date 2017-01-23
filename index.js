@@ -78,6 +78,7 @@ function handleRequest(request, response) {
     var returnArr = [];
     var cursor = db.collection('imagesearches').find({});
     cursor.each(function(err,doc){
+      console.log('pusing doc: ' + doc);
       returnArr.push(doc);
     });
     if(returnArr.length > 0){
