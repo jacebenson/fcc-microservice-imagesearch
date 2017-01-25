@@ -1,28 +1,24 @@
 'use strict';
+var port           = process.env.PORT || 5000;
+var client_id      = process.env.CLIENT_ID || require('./.env').client_id;
+var mongoURI       = process.env.MONGOLAB_URI;
+var MongoClient    = mongodb.MongoClient;
+var url            = require('url');
+var http           = require('http');
+var mongodb        = require('mongodb');
+var express        = require('express');        // call express
+var app            = express();                 // define our app using express
+var bodyParser     = require('body-parser');
+var routes         = require('./app/routes/public.js');
+var api            = require('./app/routes/api.js');
 
-// call the packages we need
-var express    = require('express');        // call express
-var app        = express();                 // define our app using express
-var bodyParser = require('body-parser');
-var routes = require('./app/routes/index.js');
-//var api = require('./app/api/timestamp.js');
-app.route('/')
-    .get(function(req, res) {
-      res.sendFile(process.cwd() + '/public/index.html');
-    });
 // configure app to use bodyParser()
 // this will let us get the data from a POST
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
-app.use('/public', express.static(process.cwd() + '/public'));
-    
-var port = process.env.PORT || 8080;        // set our port
-    
-// The format follows as, alias to use for real path, also allows permission to such path.
-//app.use('/api', express.static(process.cwd() + '/app/api'));
     
 routes(app);
-//api(app);
+api(app);
 
 app.listen(port, function() {
     console.log('Node.js listening on port ' + port);
