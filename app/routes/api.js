@@ -6,13 +6,18 @@ module.exports = function (app) {
     var mongodb = require('mongodb');
     var MongoClient = mongodb.MongoClient;
     /**
-     * @apiGroup Query
      * @api {get} /api/query?:term&:offset
+     * @apiVersion 1.0.0
+     * @apiGroup Query
      * @apiExample {curl} Example usage:
      * curl http://image-svc.herokuapp.com/api/query?term=cats&offset=1
      * 
      * @apiParam {String} term Search term
      * @apiParam {Number} offset What page of results to return, default is 0
+     *
+     * @apiSuccess {Object[]} imageData Image information
+     * @apiSuccess {String} imageData.url Image URL
+     * @apiSuccess {String} imageData.snippet Alternate Text 
      * 
      * @apiSuccessExample Success-response
      *      HTTP/1.1 200 OK
@@ -25,6 +30,33 @@ module.exports = function (app) {
      *              url: "http://i.imgur.com/WDkMVwR.png",
      *              snippet: "No one knows except you."
      *          } 
+     *      ]
+     * 
+     * @api {get} /api/history
+     * @apiVersion 1.0.0
+     * @apiGroup History
+     * 
+     * @apiSuccess {Object[]} searchQuery Search information
+     * @apiSuccess {String} searchQuery._id mongoDB id
+     * @apiSuccess {String} searchQuery.query Term searched
+     * @apiSuccess {String} searchQuery.created Date the search was logged
+     *  
+     * @apiExample {curl} Example usage:
+     * curl http://image-svc.herokuapp.com/api/history
+     * 
+     * @apiSuccessExample Success-response
+     *      HTTP/1.1 200 OK
+     *      [
+     *          {
+     *              "_id": "58883552375c8131482b5d49",
+     *              "query": "no%20one%20knows",
+     *              "created": "Tue Jan 24 2017"
+     *          },
+     *          {
+     *              "_id": "5888394ec2cec800043d1ccc",
+     *              "query": "cats",
+     *              "created": "Wed Jan 25 2017"
+     *          }
      *      ]
      */
 
@@ -125,27 +157,6 @@ module.exports = function (app) {
             //res.send(query);
             //res.sendFile(process.cwd() + '/public/index.html');
         });
-    /* 
-     * @apiGroup History
-     * @api {get} /api/history
-     * @apiExample {curl} Example usage:
-     * curl http://image-svc.herokuapp.com/api/history
-     * 
-     * @apiSuccessExample Success-response
-     *      HTTP/1.1 200 OK
-     *      [
-     *          {
-     *              "_id": "58883552375c8131482b5d49",
-     *              "query": "no%20one%20knows",
-     *              "created": "Tue Jan 24 2017"
-     *          },
-     *          {
-     *              "_id": "5888394ec2cec800043d1ccc",
-     *              "query": "cats",
-     *              "created": "Wed Jan 25 2017"
-     *          }
-     *      ]
-     */
     app.route('/api/history')
         .get(function (req, res) {
             try {
