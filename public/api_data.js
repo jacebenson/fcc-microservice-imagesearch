@@ -1,71 +1,48 @@
 define({ "api": [
   {
+    "group": "Query",
     "type": "get",
-    "url": "/user/:id",
-    "title": "Request User information",
-    "name": "GetUser",
-    "group": "User",
+    "url": "/api/query?:term&:offset",
+    "title": "",
+    "examples": [
+      {
+        "title": "Example usage:",
+        "content": "curl -i https://image-src.heroku.com/api/query?term=cats&offset=1",
+        "type": "curl"
+      }
+    ],
     "parameter": {
       "fields": {
         "Parameter": [
           {
             "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "term",
+            "description": "<p>Search term</p>"
+          },
+          {
+            "group": "Parameter",
             "type": "Number",
             "optional": false,
-            "field": "id",
-            "description": "<p>Users unique ID.</p>"
+            "field": "offset",
+            "description": "<p>What page of results to return, default is 0</p>"
           }
         ]
       }
     },
     "success": {
-      "fields": {
-        "Success 200": [
-          {
-            "group": "Success 200",
-            "type": "String",
-            "optional": false,
-            "field": "firstname",
-            "description": "<p>Firstname of the User.</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "String",
-            "optional": false,
-            "field": "lastname",
-            "description": "<p>Lastname of the User.</p>"
-          }
-        ]
-      },
       "examples": [
         {
-          "title": "Success-Response:",
-          "content": "HTTP/1.1 200 OK\n{\n  \"firstname\": \"John\",\n  \"lastname\": \"Doe\"\n}",
-          "type": "json"
-        }
-      ]
-    },
-    "error": {
-      "fields": {
-        "Error 4xx": [
-          {
-            "group": "Error 4xx",
-            "optional": false,
-            "field": "UserNotFound",
-            "description": "<p>The id of the User was not found.</p>"
-          }
-        ]
-      },
-      "examples": [
-        {
-          "title": "Error-Response:",
-          "content": "HTTP/1.1 404 Not Found\n{\n  \"error\": \"UserNotFound\"\n}",
+          "title": "Success-response",
+          "content": "HTTP/1.1 200 OK\n[\n    {\n        url: \"http:/i.imgur/cahdKic.jpg\",\n        snippet: \"As of today no one knows what happened to the Island of Itbayat and its 3000 inhabitants\"\n    },\n    {\n        url: \"http://i.imgur.com/WDkMVwR.png\",\n        snippet: \"No one knows except you.\"\n    } \n]",
           "type": "json"
         }
       ]
     },
     "version": "0.0.0",
-    "filename": "public/example.js",
-    "groupTitle": "User"
+    "filename": "app/routes/api.js",
+    "groupTitle": "Query",
+    "name": "GetApiQueryTermOffset"
   }
 ] });

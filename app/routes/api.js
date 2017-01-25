@@ -5,6 +5,28 @@ module.exports = function (app) {
     var http = require('http');
     var mongodb = require('mongodb');
     var MongoClient = mongodb.MongoClient;
+    /**
+     * @apiGroup Query
+     * @api {get} /api/query?:term&:offset
+     * @apiExample {curl} Example usage:
+     * curl -i https://image-src.heroku.com/api/query?term=cats&offset=1
+     * 
+     * @apiParam {String} term Search term
+     * @apiParam {Number} offset What page of results to return, default is 0
+     * 
+     * @apiSuccessExample Success-response
+     *      HTTP/1.1 200 OK
+     *      [
+     *          {
+     *              url: "http:/i.imgur/cahdKic.jpg",
+     *              snippet: "As of today no one knows what happened to the Island of Itbayat and its 3000 inhabitants"
+     *          },
+     *          {
+     *              url: "http://i.imgur.com/WDkMVwR.png",
+     *              snippet: "No one knows except you."
+     *          } 
+     *      ]
+     */
     app.route('/api/query')
         .get(function (req, res) {
             var term = encodeURIComponent(req.query.term);
