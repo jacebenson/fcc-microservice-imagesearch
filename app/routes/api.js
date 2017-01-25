@@ -7,8 +7,10 @@ module.exports = function (app) {
     var MongoClient = mongodb.MongoClient;
     /**
      * @api {get} /api/query?:term&:offset
+     * @apiName GetImages
      * @apiVersion 1.0.0
      * @apiGroup Query
+     * 
      * @apiExample {curl} Example usage:
      * curl http://image-svc.herokuapp.com/api/query?term=cats&offset=1
      * 
@@ -31,8 +33,11 @@ module.exports = function (app) {
      *              snippet: "No one knows except you."
      *          } 
      *      ]
-     * 
+     */
+
+    /**
      * @api {get} /api/history
+     * @apiName GetHistory
      * @apiVersion 1.0.0
      * @apiGroup History
      * 
@@ -68,7 +73,7 @@ module.exports = function (app) {
                 var options = {
                     host: 'api.imgur.com',
                     port: 80,
-                    path: '/3/gallery/search/0.json?q=' + term + '&page=' + offset,
+                    path: '/3/gallery/search/top/0.json?q=' + term + '&page=' + offset + '&q_size_px=med&window=all',
                     headers: {
                         Authorization: 'Client-Id ' + client_id
                     }
@@ -110,8 +115,23 @@ module.exports = function (app) {
                                     error: 'No Results found'
                                 }
                             }
-                            res.set('Content-Type', 'application/json');
-                            res.send(JSON.stringify(returnObj, '', '  '));
+                            if (req.query.html == 'true') {
+                                var content = '<style>.photos img{float:left;}a{clear: both;float: right;}</style>';
+                                content += '<a href="/api/query?term=' + term + '&html=true&offset=' + (offset - 1) + '">PAST PAGE</a><br/>';
+                                content += '<a href="/api/query?term=' + term + '&html=true&offset=' + (offset + 1) + '">NEXT PAGE</a><br/>';
+                                content += '<div class="photos">';
+                                for (var x = 0; x < returnObj.length; x++) {
+                                    content += '\n<img src="' + returnObj[x].url + '" alt="' + returnObj[x].snippet + '"><br/>\n';
+                                }
+                                content += '</div>';
+                                content += '<a href="/api/query?term=' + term + '&html=true&offset=' + (offset - 1) + '">PAST PAGE</a><br/>';
+                                content += '<a href="/api/query?term=' + term + '&html=true&offset=' + (offset + 1) + '">NEXT PAGE</a>';
+                                res.set('Content-Type', 'text/html');
+                                res.send(content);
+                            } else {
+                                res.set('Content-Type', 'application/json');
+                                res.send(JSON.stringify(returnObj, '', '  '));
+                            }
 
                         });
 
