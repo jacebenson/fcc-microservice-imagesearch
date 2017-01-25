@@ -6,18 +6,10 @@ const PORT         = process.env.PORT || 5000;
 //call the packages we need.
 var http           = require('http');
 var mongodb        = require('mongodb');
-var MongoClient    = mongodb.MongoClient;
+var MongoClient = mongodb.MongoClient;
 var url            = require('url');
 var express        = require('express');
-var app            = express(); 
-var bodyParser     = require('body-parser');
 
-app.use(bodyParser.urlencoded({express:true}));
-app.use(bodyParser.json());
-app.use('/public', express.static(process.cwd() + '/public'));
-app.route('/').get(function(req,res){
-    res.sendFile(process.cwd() + '/public/index.html');
-});
 
 function handleRequest(request, response) {
   //expects query param or recent if neither error
