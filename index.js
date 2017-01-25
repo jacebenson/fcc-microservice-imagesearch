@@ -5,7 +5,7 @@ var express    = require('express');        // call express
 var app        = express();                 // define our app using express
 var bodyParser = require('body-parser');
 var routes = require('./app/routes/index.js');
-var api = require('./app/api/timestamp.js');
+//var api = require('./app/api/timestamp.js');
 app.route('/')
     .get(function(req, res) {
       res.sendFile(process.cwd() + '/public/index.html');
@@ -22,7 +22,7 @@ var port = process.env.PORT || 8080;        // set our port
 //app.use('/api', express.static(process.cwd() + '/app/api'));
     
 routes(app);
-api(app);
+//api(app);
 
 app.listen(port, function() {
     console.log('Node.js listening on port ' + port);
