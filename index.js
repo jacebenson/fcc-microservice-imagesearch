@@ -1,142 +1,29 @@
 'use strict';
-//declare the env vars we need.
-var client_id      = process.env.CLIENT_ID || require('./.env').client_id;
-var mongoURI       = process.env.MONGOLAB_URI;
-const PORT         = process.env.PORT || 5000;
-//call the packages we need.
-var http           = require('http');
-var mongodb        = require('mongodb');
-var MongoClient    = mongodb.MongoClient;
-var url            = require('url');
-var express        = require('express');
-var app            = express(); 
-var bodyParser     = require('body-parser');
 
-app.use(bodyParser.urlencoded({express:true}));
+// call the packages we need
+var express    = require('express');        // call express
+var app        = express();                 // define our app using express
+var bodyParser = require('body-parser');
+var routes = require('./app/routes/index.js');
+var api = require('./app/api/timestamp.js');
+app.route('/')
+    .get(function(req, res) {
+      res.sendFile(process.cwd() + '/public/index.html');
+    });
+// configure app to use bodyParser()
+// this will let us get the data from a POST
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use('/public', express.static(process.cwd() + '/public'));
-app.route('/').get(function(req,res){
-    res.sendFile(process.cwd() + '/public/index.html');
-});
-app.route('/favicon').get(function(req,res){
-    res.sendFile(process.cwd() + '/public/favicon.ico');
-});
+    
+var port = process.env.PORT || 8080;        // set our port
+    
+// The format follows as, alias to use for real path, also allows permission to such path.
+//app.use('/api', express.static(process.cwd() + '/app/api'));
+    
+routes(app);
+api(app);
 
-function handleRequest(request, response) {
-  //expects query param or recent if neither error
-  //optional offset, if set, get records starting at n where n=offset
-  var urlObj = url.parse(request.url.toString());
-  var urlQueryArr = urlObj.query.split('&');
-  var search = {
-    query: null,
-    offset: 0
-  };
-  for (var x = 0; x < urlQueryArr.length; x++) {
-    var filter = urlQueryArr[x].split('=');
-    if (filter[0] == 'offset') { filter[1] = parseInt(filter[1]); }
-    search[filter[0]] = filter[1];
-  }
-  if (search.query) {
-    //now query imgur
-    insert(search.query);
-    var options = {
-      host: 'api.imgur.com',
-      port: 80,
-      path: '/3/gallery/search/0.json?q=' + search.query + '&page=' + search.offset,
-      headers: {
-        Authorization: 'Client-Id ' + client_id
-      }
-    };
-    http.get(options, function (res) {
-      var body = '';
-      var returnObj = [];
-      console.log("Got response: " + res.statusCode);
-      res.on("data", function (chunk) {
-        body += chunk;
-        //console.log("BODY: " + chunk);
-      });
-      res.on("end", function () {
-        var bodyObj = JSON.parse(body);
-        //parse items;
-        var items = bodyObj.data;
-        if (items) {
-          for (var n = 0; n < items.length; n++) {
-            if (items[n].is_album === false) {
-              returnObj.push(
-                {
-                  url: items[n].link,
-                  snippet: items[n].title,
-                }
-              );
-            }
-          }
-          if (returnObj.length === 0) {
-            returnObj = {
-              error: 'No Results found'
-            }
-          }
-        } else {
-          returnObj = {
-            error: 'No Results found'
-          }
-        }
-        response.setHeader('Content-Type', 'application/json');
-        response.end(JSON.stringify(returnObj, '', '    '));
-      });
-    }).on('error', function (e) {
-      console.log("Got error: " + e.message);
-    });
-  } else if (search.recent) {
-    console.log('getting recent queries');
-    MongoClient.connect(mongoURI, function (err, db) {
-      if (err) throw err;
-      var cursor = db.collection('imagesearches').find().toArray(function (err, docs) {
-        if (docs.length === 0) {
-          response.setHeader('Content-Type', 'application/json');
-          response.end(JSON.stringify({ message: 'No recent queries.' }, '', '    '));
-        } else {
-          response.setHeader('Content-Type', 'application/json');
-          response.end(JSON.stringify(docs, '', '    '));
-        }
-      });
-    });
-
-  } else {
-    console.log('query and recent params not included');
-    response.setHeader('Content-Type', 'application/json');
-    response.end(JSON.stringify({ 
-      error: 'Param query or recent required',
-      example_query: '/api/imagesearch/?query=cats',
-      example_history: '/api/imagesearch/?recent=true'
-    }, '', '    '));
-  }
-
-}
-function insert(query) {
-  var d = new Date();
-  var dateString = d.toDateString() + ' ' + d.getHours() + '00';
-  MongoClient.connect(mongoURI, function (err, db) {
-    if (err) throw err;
-    var id = db.collection('imagesearches').count({}, function (error, numOfDocs) {
-      if (err) throw err;
-      //console.log('numOfDocs: ' + numOfDocs);
-      if (numOfDocs !== null) {
-        if (numOfDocs > 5) {
-          //console.log('numOfDocs > 5 deleting one where, dateString: ' + dateString);
-          db.collection('imagesearches').remove({ created: { $ne: dateString } });
-        }
-      }
-      item = {
-        query: query,
-        created: dateString
-      };
-      db.collection('imagesearches').insert(item);
-      db.close();
-    });
-  });
-}
-
-var server = http.createServer(handleRequest);
-server.listen(PORT, function () {
-  console.log("Server listening on: http://localhost:%s", PORT);
+app.listen(port, function() {
+    console.log('Node.js listening on port ' + port);
 });
