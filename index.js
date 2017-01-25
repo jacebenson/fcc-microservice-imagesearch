@@ -18,6 +18,9 @@ app.use('/public', express.static(process.cwd() + '/public'));
 app.route('/').get(function(req,res){
     res.sendFile(process.cwd() + '/public/index.html');
 });
+app.route('/favicon').get(function(req,res){
+    res.sendFile(process.cwd() + '/public/favicon.ico');
+});
 
 function handleRequest(request, response) {
   //expects query param or recent if neither error
