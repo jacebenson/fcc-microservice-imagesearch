@@ -26,14 +26,6 @@ node index.js
 
 ```
 #call it with curl
-
+curl http://localhost:5000/api/query=term=cats&offset=0
+curl http://localhost:5000/api/history
 ```
-curl http://image-svc.herokuapp.com/api/query=term=cats&offset=0
-```
-
-```
-curl http://image-svc.herokuapp.com/api/history
-```
-Query URL: image-svc.herokuapp.com/api/imagesearch/?query=cats
-
-Recent Queries: image-svc.herokuapp.com/api/imagesearch/?recent=true
