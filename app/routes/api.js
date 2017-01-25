@@ -116,16 +116,22 @@ module.exports = function (app) {
                                 }
                             }
                             if (req.query.html == 'true') {
-                                var content = '<style>.photos img{float:left;}a{clear: both;float: right;}</style>';
+                                var content = '<style>.hide{display:none}</style>';
+                                content += '<script src="http://code.jquery.com/jquery-3.1.1.slim.min.js"></script>';
+                                content += '<script>function tgl(a,b){$("#" + a).toggleClass("hide");$("#" + b).toggleClass("hide")}</script>';
                                 content += '<a href="/api/query?term=' + term + '&html=true&offset=' + (offset - 1) + '">PAST PAGE</a><br/>';
                                 content += '<a href="/api/query?term=' + term + '&html=true&offset=' + (offset + 1) + '">NEXT PAGE</a><br/>';
                                 content += '<div class="photos">';
                                 for (var x = 0; x < returnObj.length; x++) {
-                                    content += '\n<img src="' + returnObj[x].url + '" alt="' + returnObj[x].snippet + '"><br/>\n';
+                                    content += '\n<a href="#" onclick="tgl(\''+(x)+'\',\''+(x+1)+'\')">';
+                                    if (x === 0) {
+                                        content += '\n<img class="" id="' + x + '" src="' + returnObj[x].url + '" alt="' + returnObj[x].snippet + '"><br/>\n';
+                                    } else {
+                                        content += '\n<img class="hide" id="' + x + '" src="' + returnObj[x].url + '" alt="' + returnObj[x].snippet + '"><br/>\n';
+                                    }
+                                    content += '\n</a>';
                                 }
                                 content += '</div>';
-                                content += '<a href="/api/query?term=' + term + '&html=true&offset=' + (offset - 1) + '">PAST PAGE</a><br/>';
-                                content += '<a href="/api/query?term=' + term + '&html=true&offset=' + (offset + 1) + '">NEXT PAGE</a>';
                                 res.set('Content-Type', 'text/html');
                                 res.send(content);
                             } else {
