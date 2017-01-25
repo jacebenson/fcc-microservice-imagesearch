@@ -9,7 +9,7 @@ module.exports = function (app) {
      * @apiGroup Query
      * @api {get} /api/query?:term&:offset
      * @apiExample {curl} Example usage:
-     * curl -i https://image-src.heroku.com/api/query?term=cats&offset=1
+     * curl http://image-svc.herokuapp.com/api/query?term=cats&offset=1
      * 
      * @apiParam {String} term Search term
      * @apiParam {Number} offset What page of results to return, default is 0
@@ -27,6 +27,7 @@ module.exports = function (app) {
      *          } 
      *      ]
      */
+
     app.route('/api/query')
         .get(function (req, res) {
             var term = encodeURIComponent(req.query.term);
@@ -124,6 +125,27 @@ module.exports = function (app) {
             //res.send(query);
             //res.sendFile(process.cwd() + '/public/index.html');
         });
+    /* 
+     * @apiGroup History
+     * @api {get} /api/history
+     * @apiExample {curl} Example usage:
+     * curl http://image-svc.herokuapp.com/api/history
+     * 
+     * @apiSuccessExample Success-response
+     *      HTTP/1.1 200 OK
+     *      [
+     *          {
+     *              "_id": "58883552375c8131482b5d49",
+     *              "query": "no%20one%20knows",
+     *              "created": "Tue Jan 24 2017"
+     *          },
+     *          {
+     *              "_id": "5888394ec2cec800043d1ccc",
+     *              "query": "cats",
+     *              "created": "Wed Jan 25 2017"
+     *          }
+     *      ]
+     */
     app.route('/api/history')
         .get(function (req, res) {
             try {

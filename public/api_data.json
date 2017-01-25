@@ -7,7 +7,7 @@
     "examples": [
       {
         "title": "Example usage:",
-        "content": "curl -i https://image-src.heroku.com/api/query?term=cats&offset=1",
+        "content": "curl http://image-svc.herokuapp.com/api/query?term=cats&offset=1",
         "type": "curl"
       }
     ],
